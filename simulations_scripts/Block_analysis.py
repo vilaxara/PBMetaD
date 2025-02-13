@@ -68,7 +68,7 @@ def free_energy_1D_blockerror( a:np.array, x0:float, xmax:float, bins:int, block
     max = np.max(histo)
     # free_energy=-(0.001987*T)*np.log(histo)
     free_energy = -(0.001987*T)*np.log(histo+.000001)
-    free_energy = free_energy-np.min(free_energy)
+    free_energy = free_energy-np.min(free_energy) # Normalize free energy
     xcenters = xedges[:-1] + np.diff(xedges)/2
     Ind = chunkIt(len(a), blocks)
     block_size = (Ind[0][1]-Ind[0][0])
@@ -282,7 +282,7 @@ def get_blockerrors_pyblock_nanskip_rw_(Data:np.array, bound_frac:float, Weights
     be_bf = np.asarray(block_errors)/bound_frac
     return ave_bf, be_bf
 
-def free_energy_2D(Y, X, bins:int=None, T:int=None, y0:float=None, ymax:float=None, x0:float=None,
+def free_energy_2D(Y, X, bins=None, T:int=None, y0:float=None, ymax:float=None, x0:float=None,
                    xmax:float=None, weights=None):
     """
     Calculate the 2D free energy surface.
@@ -314,5 +314,9 @@ def free_energy_2D(Y, X, bins:int=None, T:int=None, y0:float=None, ymax:float=No
     # Prevent log of zero by adding a small constant
     free_energy = np.log(np.flipud(histo) + 0.000001)
     free_energy = -(0.001987 * T) * free_energy
+    free_energy = free_energy-np.min(free_energy) # Normalize free energy
 
-    return free_energy, xedges, yedges, histo
+    xcenters = xedges[:-1] + np.diff(xedges)/2
+    ycenters = yedges[:-1] + np.diff(yedges)/2
+
+    return free_energy, xcenters, ycenters, histo
