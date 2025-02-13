@@ -282,3 +282,37 @@ def get_blockerrors_pyblock_nanskip_rw_(Data:np.array, bound_frac:float, Weights
     be_bf = np.asarray(block_errors)/bound_frac
     return ave_bf, be_bf
 
+def free_energy_2D(Y, X, bins:int=None, T:int=None, y0:float=None, ymax:float=None, x0:float=None,
+                   xmax:float=None, weights=None):
+    """
+    Calculate the 2D free energy surface.
+
+    Parameters:
+        Y, X: np.ndarray
+            Data for the Y and X axes.
+        bins: int
+            Number of bins for the histogram.
+        T: int
+            Temperature for the free energy calculation.
+        y0, ymax: float
+            Range for the Y-axis.
+        x0, xmax: float
+            Range for the X-axis.
+        weights: np.ndarray
+            Weights for the histogram.
+
+    Returns:
+        free_energy: np.ndarray
+            The calculated free energy surface.
+        xedges, yedges: np.ndarray
+            The edges of the bins in X and Y dimensions.
+    """
+    histo, xedges, yedges = np.histogram2d(
+        Y, X, bins, [[y0, ymax], [x0, xmax]], density=True, weights=weights
+    )
+
+    # Prevent log of zero by adding a small constant
+    free_energy = np.log(np.flipud(histo) + 0.000001)
+    free_energy = -(0.001987 * T) * free_energy
+
+    return free_energy, xedges, yedges, histo
